@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { FormEvent, useCallback, useRef, useState, type PointerEvent } from "react";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { publicAsset } from "@/lib/assets";
 
 type Lang = "en" | "es";
 
@@ -228,7 +229,7 @@ function BeforeAfterSlider({ lang }: { lang: Lang }) {
         }}
       >
         <Image
-          src="/after.png"
+          src={publicAsset("/after.png")}
           alt="After landscaping project image"
           className="h-full w-full object-cover"
           fill
@@ -237,7 +238,7 @@ function BeforeAfterSlider({ lang }: { lang: Lang }) {
         />
         <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}>
           <Image
-            src="/before.png"
+            src={publicAsset("/before.png")}
             alt="Before landscaping project image"
             className="h-full w-full object-cover"
             fill
