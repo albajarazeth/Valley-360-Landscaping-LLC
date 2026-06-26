@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { FormEvent, useCallback, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useRef, useState, type PointerEvent } from "react";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { publicAsset } from "@/lib/assets";
+import { estimateMailto } from "@/lib/contact";
 
 type Lang = "en" | "es";
 
@@ -39,11 +40,7 @@ const copy = {
     sliderAria: "Drag to compare before and after landscaping",
     formTitle: "Request Your Free Estimate",
     formText: "Tell us about your project and we'll follow up quickly with next steps.",
-    namePlaceholder: "Name",
-    phonePlaceholder: "Phone",
-    servicePlaceholder: "Service Needed",
-    zipPlaceholder: "Zip Code",
-    formSubmit: "Get a Free Estimate",
+    formSubmit: "Email Us for a Free Estimate",
     contactTitle: "Contact Information",
     companyLabel: "Company",
     contactLabel: "Contact",
@@ -80,11 +77,7 @@ const copy = {
     sliderAria: "Arrastre para comparar antes y despues del paisajismo",
     formTitle: "Solicite su Cotizacion Gratis",
     formText: "Cuentenos sobre su proyecto y le responderemos pronto con los siguientes pasos.",
-    namePlaceholder: "Nombre",
-    phonePlaceholder: "Telefono",
-    servicePlaceholder: "Servicio Necesario",
-    zipPlaceholder: "Codigo Postal",
-    formSubmit: "Cotizacion Gratis",
+    formSubmit: "Enviar correo para cotizacion gratis",
     contactTitle: "Informacion de Contacto",
     companyLabel: "Empresa",
     contactLabel: "Contacto",
@@ -167,8 +160,6 @@ const testimonials = {
     },
   ],
 };
-
-const zipCodes = ["78501", "78502", "78503", "78504", "78505"];
 
 function BeforeAfterSlider({ lang }: { lang: Lang }) {
   const [position, setPosition] = useState(50);
@@ -271,10 +262,6 @@ export default function Home() {
   const t = copy[lang];
   const activeServices = serviceOptions[lang];
   const activeTestimonials = testimonials[lang];
-
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-  };
 
   return (
     <div className="overflow-x-hidden bg-forest-deep text-slate-100">
@@ -427,41 +414,12 @@ export default function Home() {
               <div className="section-accent" />
               <p className="section-lead">{t.formText as string}</p>
             </div>
-            <form onSubmit={onSubmit} className="grid gap-5 md:grid-cols-2">
-              <input
-                required
-                type="text"
-                placeholder={t.namePlaceholder as string}
-                className="field-premium"
-              />
-              <input
-                required
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                placeholder={t.phonePlaceholder as string}
-                className="field-premium"
-              />
-              <select required className="field-premium" defaultValue="">
-                <option value="" disabled>
-                  {t.servicePlaceholder as string}
-                </option>
-                {activeServices.map((service) => (
-                  <option key={service.title}>{service.title}</option>
-                ))}
-              </select>
-              <select required className="field-premium" defaultValue="">
-                <option value="" disabled>
-                  {t.zipPlaceholder as string}
-                </option>
-                {zipCodes.map((zip) => (
-                  <option key={zip}>{zip}</option>
-                ))}
-              </select>
-              <button type="submit" className="btn-primary w-full md:col-span-2">
-                {t.formSubmit as string}
-              </button>
-            </form>
+            <a
+              href={estimateMailto(lang)}
+              className="btn-primary w-full sm:w-auto"
+            >
+              {t.formSubmit as string}
+            </a>
           </div>
         </section>
 
