@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useCallback, useRef, useState, type PointerEvent } from "react";
 import afterImage from "../../assets/after.png";
@@ -18,6 +19,17 @@ import {
   StarIcon,
   WhyIcon,
 } from "@/components/icons";
+import {
+  MotionButtonLink,
+  MotionCard,
+  MotionGridItem,
+  MotionSection,
+  Reveal,
+  easeOut,
+  fadeUp,
+  staggerContainer,
+  staggerFast,
+} from "@/components/motion";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { CONTACT_EMAIL, estimateMailto } from "@/lib/contact";
 
@@ -180,6 +192,7 @@ function BeforeAfterSlider({ lang }: { lang: Lang }) {
   const [position, setPosition] = useState(50);
   const isDraggingRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
   const t = copy[lang];
 
   const updatePosition = useCallback((clientX: number) => {
@@ -209,47 +222,61 @@ function BeforeAfterSlider({ lang }: { lang: Lang }) {
   };
 
   return (
-    <div className="slider-wrap">
-      <h3 className="section-title" style={{ fontSize: "1.125rem", marginBottom: "1rem" }}>
-        {t.sliderTitle as string}
-      </h3>
-      <div
-        ref={containerRef}
-        className="slider-frame"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        role="slider"
-        aria-label={t.sliderAria as string}
-        aria-valuemin={5}
-        aria-valuemax={95}
-        aria-valuenow={Math.round(position)}
-        tabIndex={0}
-        onKeyDown={(event) => {
-          if (event.key === "ArrowLeft") setPosition((c) => Math.max(5, c - 5));
-          if (event.key === "ArrowRight") setPosition((c) => Math.min(95, c + 5));
-        }}
-      >
-        <Image src={afterImage} alt="After landscaping" fill className="object-cover" sizes="(max-width: 768px) 100vw, 900px" draggable={false} />
-        <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}>
-          <Image src={beforeImage} alt="Before landscaping" fill className="object-cover" sizes="(max-width: 768px) 100vw, 900px" draggable={false} />
+    <Reveal variant="scaleIn">
+      <div className="slider-wrap">
+        <h3 className="section-title" style={{ fontSize: "1.125rem", marginBottom: "1rem" }}>
+          {t.sliderTitle as string}
+        </h3>
+        <div
+          ref={containerRef}
+          className="slider-frame"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          role="slider"
+          aria-label={t.sliderAria as string}
+          aria-valuemin={5}
+          aria-valuemax={95}
+          aria-valuenow={Math.round(position)}
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowLeft") setPosition((c) => Math.max(5, c - 5));
+            if (event.key === "ArrowRight") setPosition((c) => Math.min(95, c + 5));
+          }}
+        >
+          <Image src={afterImage} alt="After landscaping" fill className="object-cover" sizes="(max-width: 768px) 100vw, 900px" draggable={false} />
+          <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}>
+            <Image src={beforeImage} alt="Before landscaping" fill className="object-cover" sizes="(max-width: 768px) 100vw, 900px" draggable={false} />
+          </div>
+          <motion.div
+            className="slider-divider"
+            style={{ left: `${position}%` }}
+            animate={{ left: `${position}%` }}
+            transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 32 }}
+          />
+          <motion.div
+            className="slider-handle"
+            style={{ left: `${position}%` }}
+            animate={{ left: `${position}%` }}
+            transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 32 }}
+            aria-hidden
+          >
+            ↔
+          </motion.div>
         </div>
-        <div className="slider-divider" style={{ left: `${position}%` }} />
-        <div className="slider-handle" style={{ left: `${position}%` }} aria-hidden>
-          ↔
+        <div style={{ marginTop: "0.75rem", display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#64748b" }}>
+          <span>{t.beforeLabel as string}</span>
+          <span>{t.afterLabel as string}</span>
         </div>
       </div>
-      <div style={{ marginTop: "0.75rem", display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#64748b" }}>
-        <span>{t.beforeLabel as string}</span>
-        <span>{t.afterLabel as string}</span>
-      </div>
-    </div>
+    </Reveal>
   );
 }
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("en");
+  const reduceMotion = useReducedMotion();
   const t = copy[lang];
   const activeServices = serviceOptions[lang];
   const activeTestimonials = testimonials[lang];
@@ -257,7 +284,12 @@ export default function Home() {
 
   return (
     <div className="site">
-      <header className="site-header">
+      <motion.header
+        className="site-header"
+        initial={reduceMotion ? false : { opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, ease: easeOut }}
+      >
         <div className="container-main" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.75rem", paddingBlock: "1rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", minWidth: 0 }}>
             <span className="icon-box">
@@ -279,53 +311,72 @@ export default function Home() {
             </a>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       <main>
         <section className="hero">
-          <div className="hero-bg" />
+          <motion.div
+            className="hero-bg"
+            initial={reduceMotion ? false : { scale: 1.08 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 1.4, ease: easeOut }}
+          />
           <div className="hero-overlay" />
-          <div className="container-main hero-inner">
-            <p className="hero-tag">{t.heroTag as string}</p>
-            <h1 className="hero-title">
+          <motion.div
+            className="container-main hero-inner"
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+          >
+            <motion.p className="hero-tag" variants={fadeUp}>
+              {t.heroTag as string}
+            </motion.p>
+            <motion.h1 className="hero-title" variants={fadeUp}>
               {t.heroPrefix as string}{" "}
               <span className="hero-highlight">{t.heroHighlight as string}</span>{" "}
               {t.heroSuffix as string}
-            </h1>
-            <p className="hero-sub">{t.heroSubheadline as string}</p>
-            <div className="hero-actions">
-              <a href="#lead-form" className="btn-primary">
+            </motion.h1>
+            <motion.p className="hero-sub" variants={fadeUp}>
+              {t.heroSubheadline as string}
+            </motion.p>
+            <motion.div className="hero-actions" variants={fadeUp}>
+              <MotionButtonLink href="#lead-form" className="btn-primary">
                 {t.topCta as string}
                 <ArrowRightIcon />
-              </a>
-              <a href="#gallery" className="btn-secondary">
+              </MotionButtonLink>
+              <MotionButtonLink href="#gallery" className="btn-secondary">
                 <GalleryIcon />
                 {t.heroSecondaryCta as string}
-              </a>
-            </div>
-            <div className="trust-row">
+              </MotionButtonLink>
+            </motion.div>
+            <motion.div className="trust-row" variants={staggerFast}>
               {trustBadges.map((badge, i) => {
                 const Icon = trustIcons[i];
                 return (
-                  <div key={badge} className="trust-item">
+                  <motion.div key={badge} className="trust-item" variants={fadeUp}>
                     <Icon />
                     <span>{badge}</span>
-                  </div>
+                  </motion.div>
                 );
               })}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
 
-        <section className="bg-surface-2 section-pad">
+        <MotionSection className="bg-surface-2 section-pad">
           <div className="container-main">
-            <div className="section-intro">
+            <Reveal className="section-intro">
               <h2 className="section-title">{t.servicesTitle as string}</h2>
               <p className="section-lead">{t.servicesText as string}</p>
-            </div>
+            </Reveal>
             <div className="services-grid">
               {activeServices.map((service, index) => (
-                <article key={service.title} className="card" style={{ display: "flex", flexDirection: "column" }}>
+                <MotionCard
+                  key={service.title}
+                  index={index}
+                  className="card"
+                  style={{ display: "flex", flexDirection: "column" }}
+                >
                   <span className="icon-box">
                     <ServiceIcon index={index} />
                   </span>
@@ -344,20 +395,20 @@ export default function Home() {
                     {t.learnMore as string}
                     <ArrowRightIcon />
                   </a>
-                </article>
+                </MotionCard>
               ))}
             </div>
           </div>
-        </section>
+        </MotionSection>
 
-        <section className="bg-surface section-pad">
+        <MotionSection className="bg-surface section-pad">
           <div className="container-main">
-            <div className="section-intro">
+            <Reveal className="section-intro">
               <h2 className="section-title">{t.whyTitle as string}</h2>
-            </div>
+            </Reveal>
             <div className="promise-grid">
               {(t.whyItems as { title: string; text: string }[]).map((item, index) => (
-                <div key={item.title} className="card promise-card">
+                <MotionGridItem key={item.title} index={index} className="card promise-card">
                   <span className="icon-box">
                     <WhyIcon index={index} />
                   </span>
@@ -367,20 +418,20 @@ export default function Home() {
                       {item.text}
                     </p>
                   </div>
-                </div>
+                </MotionGridItem>
               ))}
             </div>
           </div>
-        </section>
+        </MotionSection>
 
-        <section id="gallery" className="bg-surface-2 section-pad">
+        <MotionSection id="gallery" className="bg-surface-2 section-pad">
           <div className="container-main">
-            <div className="section-intro">
+            <Reveal className="section-intro">
               <h2 className="section-title">{t.reviewsTitle as string}</h2>
-            </div>
+            </Reveal>
             <div className="reviews-grid">
-              {activeTestimonials.map((testimonial) => (
-                <blockquote key={testimonial.author} className="card" style={{ display: "flex", flexDirection: "column" }}>
+              {activeTestimonials.map((testimonial, index) => (
+                <MotionGridItem key={testimonial.author} index={index} className="card" style={{ display: "flex", flexDirection: "column" }}>
                   <div className="stars">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <StarIcon key={i} />
@@ -392,16 +443,17 @@ export default function Home() {
                   <footer style={{ marginTop: "1rem", fontSize: "0.875rem", fontWeight: 500 }} className="text-brand">
                     {testimonial.author}
                   </footer>
-                </blockquote>
+                </MotionGridItem>
               ))}
             </div>
             <BeforeAfterSlider lang={lang} />
           </div>
-        </section>
+        </MotionSection>
 
-        <section id="lead-form" className="bg-surface section-pad">
+        <MotionSection id="lead-form" className="bg-surface section-pad">
           <div className="container-main" style={{ maxWidth: "64rem" }}>
-            <div className="cta-card">
+            <Reveal variant="scaleIn">
+              <div className="cta-card">
               <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
                 <span className="icon-box" style={{ width: "3rem", height: "3rem" }}>
                   <LeafIcon />
@@ -416,26 +468,29 @@ export default function Home() {
                 </div>
               </div>
               <div className="cta-actions" style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                <a href={estimateMailto(lang)} className="btn-primary">
+                <MotionButtonLink href={estimateMailto(lang)} className="btn-primary">
                   {t.formSubmit as string}
                   <ArrowRightIcon />
-                </a>
+                </MotionButtonLink>
                 <p className="cta-note">
                   <CheckIcon />
                   {t.formNote as string}
                 </p>
               </div>
-            </div>
+              </div>
+            </Reveal>
           </div>
-        </section>
+        </MotionSection>
 
-        <section className="bg-surface-2 section-pad" style={{ paddingBottom: "3rem" }}>
+        <MotionSection className="bg-surface-2 section-pad" style={{ paddingBottom: "3rem" }}>
           <div className="container-main">
-            <h2 className="section-title" style={{ textAlign: "center", marginBottom: "2rem" }}>
-              {t.contactTitle as string}
-            </h2>
+            <Reveal>
+              <h2 className="section-title" style={{ textAlign: "center", marginBottom: "2rem" }}>
+                {t.contactTitle as string}
+              </h2>
+            </Reveal>
             <div className="contact-grid">
-              <div className="card contact-card">
+              <MotionGridItem index={0} className="card contact-card">
                 <LocationIcon />
                 <div>
                   <p className="contact-label">{t.companyLabel as string}</p>
@@ -444,8 +499,8 @@ export default function Home() {
                     McAllen, TX, United States, 78504
                   </p>
                 </div>
-              </div>
-              <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+              </MotionGridItem>
+              <MotionGridItem index={1} className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                 <div className="contact-card">
                   <PhoneIcon />
                   <div>
@@ -461,10 +516,10 @@ export default function Home() {
                     {CONTACT_EMAIL}
                   </a>
                 </div>
-              </div>
+              </MotionGridItem>
             </div>
           </div>
-        </section>
+        </MotionSection>
       </main>
 
       <WhatsAppButton />
